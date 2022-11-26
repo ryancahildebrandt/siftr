@@ -1,0 +1,8 @@
+data/enwiki*
+data/text.csv
+*.RData
+.Rhistory
+.Rprofile
+*.Rproj*
+renv/
+rsconnect/
