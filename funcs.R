@@ -6,30 +6,28 @@
 # imports ----
 {
 	
-	
-	library(tidyverse)
-	load("./data/ef_list.RData")
+	load("./app_data/ef_list.RData")
 }
 
 # emb funcs ----
-word_sif <- function(word,  weight_param = 1e-3) {
-	if (!(word %in% names(ef_list))) {
+word_sif <- function(word, efl,  weight_param = 1e-3) {
+	if (!(word %in% names(efl))) {
 		word <- "_UNK_"
 	}
-	word_emb <- unlist(ef_list[[word]]$emb[[1]])
-	word_freq <- ef_list[[word]]$freq
+	word_emb <- unlist(efl[[word]]$emb[[1]])
+	word_freq <- efl[[word]]$freq
 	word_weight <- weight_param / (weight_param + word_freq)
 	out <- word_weight * word_emb
 	return(out)
 }
 
 sent_sif <- function(sentence) {
-	sent <- sentence %>% 
-		tolower(.) %>% 
-		str_replace_all(., "[[:punct:]]", "") %>% 
-		str_split(., " ") %>% 
-		unlist(.)
-	sent_mat <- sapply(sent, word_sif)
+	sent <- tolower(sentence) 
+	sent <- gsub("[[:punct:]]", "", sent) 
+	sent <- strsplit(sent, " ")
+	sent <- unlist(sent)
+
+	sent_mat <- sapply(sent, word_sif, efl = ef_list)
 	sent_sum <- apply(sent_mat, 1, sum)
 	out <- sent_sum / length(sent)
 	return(out)
@@ -37,9 +35,10 @@ sent_sif <- function(sentence) {
 
 # model funcs ----
 train_rf <- function(in_df) {
+	in_df <- in_df[!is.na(in_df$user), !colnames(in_df) %in% c("text", "model", "emb", "keep", "sift")]
 	mdl <- train(
 		form = user ~ .,
-		data = in_df %>% dplyr::select(., -text, -model, -emb, -keep, -sift) %>% filter(., !is.na(user)),
+		data = in_df,
 		method = "rf"
 	)
 	out <- list(
@@ -54,13 +53,10 @@ train_rf <- function(in_df) {
 }
 
 pred_rf <- function(in_df, rf) {
-	out <- in_df %>%
-		mutate(., 
-			   keep = predict(rf$mdl, newdata = in_df[, 5:ncol(in_df)], type = "prob")[, 1],
-			   sift = predict(rf$mdl, newdata = in_df[, 5:ncol(in_df)], type = "prob")[, 2], 
-			   model = predict(rf$mdl, newdata = in_df[, 5:ncol(in_df)])
-		) %>%
-		arrange(., keep)
+	in_df$keep <- predict(rf$mdl, newdata = in_df[, 5:ncol(in_df)], type = "prob")[, 1]
+	in_df$sift <- predict(rf$mdl, newdata = in_df[, 5:ncol(in_df)], type = "prob")[, 2]
+	in_df$model <- predict(rf$mdl, newdata = in_df[, 5:ncol(in_df)])
+	out <- in_df[order(in_df$keep),]
 	return(out)
 }
 
@@ -99,15 +95,12 @@ render_rt <- function(in_df) {
 }
 
 prep_df <- function(in_df) {
-	out <- in_df %>% 
-		mutate(.,
-			   user = NA,
-			   model = NA,
-			   keep = NA, 
-			   sift = NA, 
-			   emb = apply(.["text"], 1, function(x) list(sent_sif(x)))
-			   ) %>%
-		cbind(., matrix(unlist(.$emb), ncol = 100))
+	in_df$user <- NA
+	in_df$model <- NA
+	in_df$keep <- NA
+	in_df$sift <- NA
+	in_df$emb <- apply(in_df["text"], 1, function(x) list(sent_sif(x)))
+	out <- cbind(in_df, matrix(unlist(in_df$emb), ncol = 100))
 	return(out)
 }
 

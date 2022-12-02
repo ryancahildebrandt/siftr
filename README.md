@@ -60,4 +60,5 @@ The above code also assigns a vector of 0s for words not contained in the model 
 ## Outputs
 
 - [SIFtR](https://rhildebrandt.shinyapps.io/siftr/) Shiny app. The vocabulary has been kept to a 300,000 out of the full 1.5m words, due to memory constraints on unpaid Shiny projects. If you need a larger vocabulary, the full 1.5m word embeddings load with 8GB of memory no problem.
+- siftr R package, which includes the SIF implementation and associated embedding and frequency data. devtools::install_github("ryancahildebrandt/siftr")
 

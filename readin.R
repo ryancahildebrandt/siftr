@@ -6,40 +6,41 @@
 # imports ----
 {
 	
-	
-	library(tidyverse)
+	library(readr)
 }
 
 # get files ----
 options(timeout = 3000)
 download.file(
 	"http://wikipedia2vec.s3.amazonaws.com/models/en/2018-04-20/enwiki_20180420_win10_100d.txt.bz2",
-	"./data/enwiki_20180420_win10_100d.txt.bz2"
+	"./app_data/enwiki_20180420_win10_100d.txt.bz2"
 	)
 unzip(
-	zipfile = "./data/enwiki_20180420_win10_100d.txt.bz2",
-	exdir = "./data/"
+	zipfile = "./app_data/enwiki_20180420_win10_100d.txt.bz2",
+	exdir = "./app_data/"
 	)
 
 download.file(
 	"https://raw.githubusercontent.com/IlyaSemenov/wikipedia-word-frequency/master/results/enwiki-2022-08-29.txt",
-	"./data/enwiki-2022-08-29.txt"
+	"./app_data/enwiki-2022-08-29.txt"
 	)
 
 # embs/freqs merge ----
 ef_df <- merge(
-	x = read_delim("./data/enwiki_20180420_win10_100d.txt.bz2", col_names = FALSE, skip = 1),
-	y = read_delim("./data/enwiki-2022-08-29.txt", col_names = c("X1","freq")),
+	x = read_delim("./app_data/enwiki_20180420_win10_100d.txt.bz2", col_names = FALSE, skip = 1),
+	y = read_delim("./app_data/enwiki-2022-08-29.txt", col_names = c("X1","freq")),
 	by.x = "X1",
-	by.y = "X1") %>%
-	rename(., word = X1) %>% 
-	mutate(., emb = apply(.[, 2:101], 1, function(i) list(as.vector(i, "numeric")))) %>% 
-	dplyr::select(., -c(X2:X101)) %>% 
-	add_row(word = "_UNK_", emb = list(rep(0, 100)), freq = 0)
+	by.y = "X1") 
+colnames(ef_df)[1] <- "word"
+ef_df <- ef_df[order(-ef_df$freq),]
+ef_df$emb <- apply(ef_df[, 2:101], 1, function(i) list(as.vector(i, "numeric")))
+ef_df <- ef_df[, c(1, 102, 103)]
+ef_df <- rbind(ef_df, list(word = "_UNK_", emb = list(rep(0, 100)), freq = 0))
 
 ef_list <- split(ef_df, ef_df$word)
-ef_list <- ef_list[1:300000]
+# uncomment following line to limit vocab
+#ef_list <- ef_list[1:300000]
 
 # save ----
-#save(ef_df, file = "./data/ef_df.RData")
-save(ef_list, file = "./data/ef_list.RData")
+#save(ef_df, file = "./app_data/ef_df.RData")
+save(ef_list, file = "./app_data/ef_list.RData", compress = "bzip2")

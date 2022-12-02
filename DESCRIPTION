@@ -1,0 +1,18 @@
+Package: siftr
+Title: Smooth Inverse Frequency (SIF) Sentence Embeddings
+Version: 0.0.0.9000
+Authors@R: 
+    person("Ryan", "Hildebrandt", , "ryancahildebrandt@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: SIF is a relatively lightweight and remarkably accurate sentence embedding approach, which in some tasks provides comparable performance to neural network based embedding models. The present SIF implementation is based on the [original](https://github.com/PrincetonML/SIF) algorithm as well as [this](https://www.kaggle.com/code/procode/sif-embeddings-got-69-accuracy/notebook) notebook, which provides a slightly simplified approach. The implementation from the original authors included principal component removal after sentence embedding calculation, which I forgo in this project for simplicity.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
+LazyData: true
+LazyDataCompression: bzip2

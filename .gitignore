@@ -6,3 +6,8 @@ data/text.csv
 *.Rproj*
 renv/
 rsconnect/
+.Rproj.user
+.Rdata
+.httr-oauth
+.DS_Store
+app_data/

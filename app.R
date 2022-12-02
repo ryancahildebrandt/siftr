@@ -12,13 +12,14 @@
     library(shinythemes)
     library(reactable)
     library(reactablefmtr)
-    library(tidyverse)
+    library(stringr)
     source("funcs.R")
 }
 
-default_df <- data.frame(text = c(stringr::fruit, stringr::sentences[1:100])) %>% 
-    prep_df(.) %>% 
-    mutate(., user = as.factor(c(rep("sift", 10), rep(NA, 160), rep("keep", 10))))
+default_df <- data.frame(text = c(stringr::fruit, stringr::sentences[1:100]))
+default_df <- prep_df(default_df)
+default_df$user[1:10] <- "sift"
+default_df$user[170:180] <- "keep"
 
 ui <- fluidPage(
     theme = shinytheme("slate"),
@@ -75,7 +76,8 @@ server <- function(input, output, session) {
     # user data
     observeEvent(input$upload, {
         withProgress(message = "processing uploaded data", {
-            rv$df <- read_csv(input$upload$datapath, col_names = "text") %>% prep_df(.)
+            df <- read_csv(input$upload$datapath, col_names = "text")
+            rv$df <- prep_df(df)
             updateReactable("df", data = rv$df[, c(1:5)])
         })
     })

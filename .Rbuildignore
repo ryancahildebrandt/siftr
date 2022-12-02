@@ -1,0 +1,11 @@
+^renv$
+^renv\.lock$
+^siftr\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$useth
+^app\.R$
+^app_data$
+^funcs\.R$
+^readin\.R$
+^rsconnect$
+^LICENSE\.md$
