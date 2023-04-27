@@ -11,3 +11,9 @@ rsconnect/
 .httr-oauth
 .DS_Store
 app_data/
+*.tsv
+*.tgz
+*.txt
+siftr.R
+siftr/
+train.R
