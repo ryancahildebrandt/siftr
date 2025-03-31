@@ -2,8 +2,8 @@
 
 ------------------------------------------------------------------------
 
-[*Open*](https://gitpod.io/#https://github.com/ryancahildebrandt/siftr) *in gitpod*
-
+[![Open in gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/ryancahildebrandt/siftr)
+[![This project contains 0% LLM-generated content](https://brainmade.org/88x31-dark.png)](https://brainmade.org/)
 ## *Purpose*
 
 The present project has 2 goals. First is an R implementation of the Smooth Inverse Frequency (SIF) algorithm for sentence embeddings, to fill a gap in sentence embedding techniques in R (that *aren't* running off python in the background). SIF is a relatively lightweight and remarkably accurate embedding approach, which in some tasks provides comparable performance to neural network based embedding models. Second is an application of this algorithm (via Shiny) to identify and *sift* out undesirable text data, based on user input fed into a random forest classifier. The app assumes desirability based on some semantic aspect of the data, and uses user provided examples of good and bad data to try and label the full dataset. The user can then provide feedback on the model predictions in order to refine it, with the intent that the user only needs to label a handful of datapoints to get a decent split between useful and non-useful data in an unlabeled dataset.
